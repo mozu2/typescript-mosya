@@ -1,13 +1,13 @@
 import type { AnswerRecord, Question } from "../types";
 
 interface Props {
-    answer: AnswerRecord[];
-    question: Question[];
+    answers: AnswerRecord[];
+    questions: Question[];
     onRetry: () => void;
 }
 
-export default function ResultScreen({ asnwers, questions, onRetry }: Props) {
-    const score = asnwers.filter((a) => a.isCorrect).length;
+export default function ResultScreen({ answers, questions, onRetry }: Props) {
+    const score = answers.filter((a) => a.isCorrect).length;
     const total = questions.length;
     const percentage = Math.round((score / total) * 100);
 
@@ -38,7 +38,7 @@ export default function ResultScreen({ asnwers, questions, onRetry }: Props) {
                             className={`asnwer-item ${answer.isCorrect ? "correct" : "wrong"}`}
                         >
                             <span className="answer-icon">
-                                {asnwers.isCorrect ? "✓" : "✗"}
+                                {answer.isCorrect ? "✓" : "✗"}
                             </span>
                             <span className="answer-question">Q{index + 1}. {question.text}</span>
                         </div>
