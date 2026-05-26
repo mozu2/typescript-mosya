@@ -41,6 +41,31 @@ exporat default function QuizCard({
             </div>
 
             <p className="question-text">{question.text}</p>
+
+            <div className="options">
+                {question.options.map((option, index) => (
+                    <button
+                        key={index}
+                        className={getOptionStyle(index)}
+                        onClick={() => onSelect(index)}
+                        disabled={answerStatus !== "unanswered"}
+                    >
+                        {option}
+                    </button>
+                ))}
+            </div>
+
+            {answerStatus !== "unanswered" && (
+                <div className={`explanation ${answerStatus}`}>
+                    <p className="explanation-label">
+                        {answerStatus === "correct" ? "正解" : "不正解"}
+                    </p>
+                    <p>{question.explanation}</p>
+                    <button className="next-button" onClick={onNext}>
+                        {currentNumber === total ? "結果を見る" : "次に進む→"}
+                    </button>
+                </div>
+            )}
         </div>
     )
 }
