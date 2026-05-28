@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { QuizPhase, AnswerRecord, AnswerStatus } from "./types";
 import { questions } from "./data/questions";
 import QuizCard from "./components/QuizCard";
 import ResultScreen from "./components/ResultScreen";
 import "./App.css";
 import './App.css'
+
 
 export default function App() {
   const [phase, setPhase] = useState<QuizPhase>("start");
@@ -14,7 +15,7 @@ export default function App() {
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [time, setTime] = useState<number>(0);
   const currentQuestion = questions[currentIndex];
-
+  const timerRef = useRef<number | undefined>(undefined);
   const handleSelect = (index: number) => {
     if (answerStatus !== "unanswered") return;
 
@@ -30,11 +31,13 @@ export default function App() {
   const handleNext = () => {
     if (currentIndex + 1 >= questions.length) {
       setPhase("result"); //結果画面に移動。なぜならphaseで画面を管理しているから。
+      clearInterval(timerRef.current);
       return;
     }
     setCurrentIndex((prev) => prev + 1);
     setSelectedIndex(null);
     setAnswerStatus("unanswered");
+
   };
 
   const handleRetry = () => {
@@ -49,11 +52,11 @@ export default function App() {
     setPhase("playing");
     setTime(0);
 
-    setInterval(() => {
-      setTime(time + 1);
-    })
-  }
+    timerRef.current = setInterval(() => {
+      setTime((prev) => prev + 1);
+    }, 1000);
 
+  }
 
   return (
     <>
@@ -62,7 +65,6 @@ export default function App() {
           <h1>TypeScript クイズ</h1>
           <p>React / TypeScript / Vite の知識を試そう！</p>
         </header>
-
         <main className="app-main">
           {phase === "start" && (
             <div className="start-screen">
@@ -71,7 +73,7 @@ export default function App() {
                 <br />
                 React・TypeScript・Vite に関する問題です。
               </p>
-              <button className="start-button" onClick={() => setPhase("playing")}>
+              <button className="start-button" onClick={() => handleStart()}>
                 start
               </button>
             </div>
@@ -86,6 +88,7 @@ export default function App() {
               selectedIndex={selectedIndex}
               onSelect={handleSelect}
               onNext={handleNext}
+              time={time}
             />
           )}
 
@@ -94,6 +97,7 @@ export default function App() {
               answers={answers}
               questions={questions}
               onRetry={handleRetry}
+              time={time}
             />
           )}
         </main>

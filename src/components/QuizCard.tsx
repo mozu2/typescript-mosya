@@ -8,6 +8,7 @@ interface Props {
     selectedIndex: number | null;
     onSelect: (index: number) => void;
     onNext: () => void;
+    time: number;
 }
 // ここに書いている理由はここでしか使用しないから。
 
@@ -19,6 +20,7 @@ export default function QuizCard({
     selectedIndex,
     onSelect,
     onNext,
+    time,
 }: Props) {
     const getOptionStyle = (index: number): string => {
         const base = "option-button";
@@ -32,7 +34,6 @@ export default function QuizCard({
             <div className="progress">
                 問題 {currentNumber}/{total}
             </div>
-
             <div className="progress-bar">
                 <div
                     className="progress-fill"
@@ -40,7 +41,7 @@ export default function QuizCard({
             </div>
 
             <p className="question-text">{question.text}</p>
-
+            <p>{time}</p>
             <div className="options">
                 {question.options.map((option, index) => (
                     <button

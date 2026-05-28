@@ -4,9 +4,10 @@ interface Props {
     answers: AnswerRecord[];
     questions: Question[];
     onRetry: () => void;
+    time: number;
 }
 
-export default function ResultScreen({ answers, questions, onRetry }: Props) {
+export default function ResultScreen({ time, answers, questions, onRetry }: Props) {
     const score = answers.filter((a) => a.isCorrect).length;
     const total = questions.length;
     const percentage = Math.round((score / total) * 100);
@@ -20,7 +21,7 @@ export default function ResultScreen({ answers, questions, onRetry }: Props) {
     return (
         <div className="result-circle">
             <h2>結果発表</h2>
-
+            <p>{time}</p>
             <div className="score-circle">
                 <span className="score-number">{score}</span>
                 <span className="score-number"> /{total}</span>
