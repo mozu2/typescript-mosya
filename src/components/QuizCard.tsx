@@ -11,7 +11,7 @@ interface Props {
 }
 // ここに書いている理由はここでしか使用しないから。
 
-exporat default function QuizCard({
+export default function QuizCard({
     question,
     currentNumber,
     total,
@@ -21,8 +21,7 @@ exporat default function QuizCard({
     onNext,
 }: Props) {
     const getOptionStyle = (index: number): string => {
-        const base = "option-button"
-
+        const base = "option-button";
         if (answerStatus === "unanswered") return base;
         if (index === question.correctIndex) return `${base} correct`;
         if (index === selectedIndex) return `${base} wrong`;

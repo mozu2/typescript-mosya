@@ -32,6 +32,7 @@ export default function ResultScreen({ answers, questions, onRetry }: Props) {
             <div className="answer-list">
                 {questions.map((question, index) => {
                     const answer = answers[index];
+                    if (!answer) return null;
                     return (
                         <div
                             key={question.id}

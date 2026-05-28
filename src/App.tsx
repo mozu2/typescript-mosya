@@ -1,122 +1,103 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useState } from "react";
+import type { QuizPhase, AnswerRecord, AnswerStatus } from "./types";
+import { questions } from "./data/questions";
+import QuizCard from "./components/QuizCard";
+import ResultScreen from "./components/ResultScreen";
+import "./App.css";
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [phase, setPhase] = useState<QuizPhase>("start");
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [answerStatus, setAnswerStatus] = useState<AnswerStatus>("unanswered");
+  const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [time, setTime] = useState<number>(0);
+  const currentQuestion = questions[currentIndex];
+
+  const handleSelect = (index: number) => {
+    if (answerStatus !== "unanswered") return;
+
+    const isCorrect = index === currentQuestion.correctIndex; //押したボタンの番号と正解番号が一致しているか確認します。
+    setSelectedIndex(index);
+    setAnswerStatus(isCorrect ? "correct" : "wrong");
+    setAnswers((prev) => [
+      ...prev,
+      { questionId: currentQuestion.id, selectedIndex: index, isCorrect },
+    ]);
+  };
+
+  const handleNext = () => {
+    if (currentIndex + 1 >= questions.length) {
+      setPhase("result"); //結果画面に移動。なぜならphaseで画面を管理しているから。
+      return;
+    }
+    setCurrentIndex((prev) => prev + 1);
+    setSelectedIndex(null);
+    setAnswerStatus("unanswered");
+  };
+
+  const handleRetry = () => {
+    setPhase("start");
+    setCurrentIndex(0);
+    setSelectedIndex(null);
+    setAnswerStatus("unanswered");
+    setAnswers([]);
+  };
+
+  const handleStart = () => {
+    setPhase("playing");
+    setTime(0);
+
+    setInterval(() => {
+      setTime(time + 1);
+    })
+  }
+
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <div className="app">
+        <header className="app-header">
+          <h1>TypeScript クイズ</h1>
+          <p>React / TypeScript / Vite の知識を試そう！</p>
+        </header>
 
-      <div className="ticks"></div>
+        <main className="app-main">
+          {phase === "start" && (
+            <div className="start-screen">
+              <p className="start-description">
+                全 {questions.length} 門のクイズに挑戦しよう！
+                <br />
+                React・TypeScript・Vite に関する問題です。
+              </p>
+              <button className="start-button" onClick={() => setPhase("playing")}>
+                start
+              </button>
+            </div>
+          )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          {phase === "playing" && (
+            <QuizCard
+              question={currentQuestion}
+              currentNumber={currentIndex + 1}
+              total={questions.length}
+              answerStatus={answerStatus}
+              selectedIndex={selectedIndex}
+              onSelect={handleSelect}
+              onNext={handleNext}
+            />
+          )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+          {phase === "result" && (
+            <ResultScreen
+              answers={answers}
+              questions={questions}
+              onRetry={handleRetry}
+            />
+          )}
+        </main>
+      </div>
     </>
-  )
+  );
 }
-
-export default App
